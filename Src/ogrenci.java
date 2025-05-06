@@ -511,80 +511,78 @@ public class ogrenci extends kullanıcı {
 	@Override
 	public void editProfile() {
 		// profili düzenle yeni bilgileri eskisinin üzerine yaz
-	    try {
-	        // Kullanıcıdan TC numarasını al
-	        System.out.print("TC Kimlik Numaranızı Girin: ");
-	        String tcNo = scanner.nextLine();
+    try {
+        // Kullanıcıdan TC numarasını al
+        System.out.print("TC Kimlik Numaranızı Girin: ");
+        String tcNo = scanner.nextLine();
 
-	        // Kullanıcıya hangi bilgiyi güncellemek istediğini sor
-	        System.out.println("Hangi bilgiyi güncellemek istiyorsunuz?");
-	        System.out.println("1. Ad");
-	        System.out.println("2. Soyad");
-	        System.out.println("3. Telefon Numarası");
-	        System.out.println("4. Şifre");
-	        System.out.print("Seçiminiz (1-4): ");
-	        int secim = scanner.nextInt();
-	        scanner.nextLine(); // Buffer temizleme
+        // Kullanıcıya hangi bilgiyi güncellemek istediğini sor
+        System.out.println("Hangi bilgiyi güncellemek istiyorsunuz?");
+        System.out.println("1. Telefon Numarası");
+        System.out.println("2. Şifre");
+        System.out.println("3. E-posta");
+        System.out.print("Seçiminiz (1-3): ");
+        int secim = scanner.nextInt();
+        scanner.nextLine(); // Buffer temizleme
 
-	        String kolon = null;
-	        String yeniDeger = null;
+        String kolon = null;
+        String yeniDeger = null;
 
-	        // Kullanıcının seçimine göre güncellenecek kolonu belirle
-	        switch (secim) {
-	            case 1:
-	                kolon = "ad";
-	                System.out.print("Yeni adınızı girin: ");
-	                yeniDeger = scanner.nextLine();
-	                break;
-	            case 2:
-	                kolon = "soyad";
-	                System.out.print("Yeni soyadınızı girin: ");
-	                yeniDeger = scanner.nextLine();
-	                break;
-	            case 3:
-	                kolon = "telefon";
-	                System.out.print("Yeni telefon numaranızı girin: ");
-	                yeniDeger = scanner.nextLine();
-	                if (!yeniDeger.matches("\\d{10}")) { // 10 haneli bir sayı kontrolü
-	                    System.out.println("Geçersiz telefon numarası formatı. Güncelleme iptal edildi.");
-	                    return;
-	                }
-	                break;
-	            case 4:
-	                kolon = "sifre";
-	                System.out.print("Yeni şifrenizi girin: ");
-	                yeniDeger = scanner.nextLine();
-	                if (yeniDeger.length() < 6) { // Şifre uzunluğu kontrolü
-	                    System.out.println("Şifre en az 6 karakter olmalıdır. Güncelleme iptal edildi.");
-	                    return;
-	                }
-	                break;
-	            default:
-	                System.out.println("Geçersiz seçim. Güncelleme iptal edildi.");
-	                return;
-	        }
+        // Kullanıcının seçimine göre güncellenecek kolonu belirle
+        switch (secim) {
+            case 1:
+                kolon = "telefon";
+                System.out.print("Yeni telefon numaranızı girin: ");
+                yeniDeger = scanner.nextLine();
+                if (!yeniDeger.matches("\\d{10}")) { // 10 haneli bir sayı kontrolü
+                    System.out.println("Geçersiz telefon numarası formatı. Güncelleme iptal edildi.");
+                    return;
+                }
+                break;
+            case 2:
+                kolon = "sifre";
+                System.out.print("Yeni şifrenizi girin: ");
+                yeniDeger = scanner.nextLine();
+                if (yeniDeger.length() < 6) { // Şifre uzunluğu kontrolü
+                    System.out.println("Şifre en az 6 karakter olmalıdır. Güncelleme iptal edildi.");
+                    return;
+                }
+                break;
+            case 3:
+                kolon = "eposta";
+                System.out.print("Yeni e-posta adresinizi girin: ");
+                yeniDeger = scanner.nextLine();
+                if (!yeniDeger.matches("^[A-Za-z0-9+_.-]+@(.+)$")) { // E-posta format kontrolü
+                    System.out.println("Geçersiz e-posta formatı. Güncelleme iptal edildi.");
+                    return;
+                }
+                break;
+            default:
+                System.out.println("Geçersiz seçim. Güncelleme iptal edildi.");
+                return;
+        }
 
-	        // Veritabanına bağlan
-	        Connection connection = DatabaseConnection.getConnection();
+        // Veritabanına bağlan
+        Connection connection = DatabaseConnection.getConnection();
 
-	        // Veritabanını güncelle
-	        String sql = "UPDATE ogrenci SET " + kolon + " = ? WHERE tcNo = ?";
-	        PreparedStatement pstmt = connection.prepareStatement(sql);
-	        pstmt.setString(1, yeniDeger);
-	        pstmt.setString(2, tcNo);
+        // Veritabanını güncelle
+        String sql = "UPDATE ogrenci SET " + kolon + " = ? WHERE tcNo = ?";
+        PreparedStatement pstmt = connection.prepareStatement(sql);
+        pstmt.setString(1, yeniDeger);
+        pstmt.setString(2, tcNo);
 
-	        int rowsAffected = pstmt.executeUpdate();
+        int rowsAffected = pstmt.executeUpdate();
 
-	        // Sonuç bildirimi
-	        if (rowsAffected > 0) {
-	            System.out.println("Profil bilgisi başarıyla güncellendi.");
-	        } else {
-	            System.out.println("Güncelleme sırasında bir hata oluştu. Lütfen bilgilerinizi kontrol edin.");
-	        }
+        // Sonuç bildirimi
+        if (rowsAffected > 0) {
+            System.out.println("Profil bilgisi başarıyla güncellendi.");
+        } else {
+            System.out.println("Güncelleme sırasında bir hata oluştu. Lütfen bilgilerinizi kontrol edin.");
+        }
 
-	    } catch (SQLException e) {
-	        System.out.println("Veritabanı hatası: " + e.getMessage());
-	    }
+    } catch (SQLException e) {
+        System.out.println("Veritabanı hatası: " + e.getMessage());
+    }
 	}
 
 	@Override
