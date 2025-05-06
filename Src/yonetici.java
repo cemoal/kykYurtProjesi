@@ -1,17 +1,62 @@
 package Src;
 import java.util.Scanner;
 public class yonetici extends kullanıcı {
+		Scanner scanner = new Scanner(System.in);
+	
 
 	@Override
 	public boolean logIn() {
-		// TODO Auto-generated method stub
-		return false;
+		 System.out.print("TC Kimlik Numaranızı Girin: ");
+    String tcNo = scanner.nextLine();
+
+    System.out.print("E-posta Adresinizi Girin: ");
+    String eposta = scanner.nextLine();
+
+    System.out.print("Şifrenizi Girin: ");
+    String sifre = scanner.nextLine();
+
+    Connection connection = null;
+
+    try {
+        // Veritabanına bağlan
+        connection = DatabaseConnection.getConnection();
+
+        // Kullanıcı bilgilerini kontrol et
+        String sql = "SELECT * FROM yonetici WHERE tcNo = ? AND eposta = ? AND sifre = ?";
+        PreparedStatement pstmt = connection.prepareStatement(sql);
+        pstmt.setString(1, tcNo);
+        pstmt.setString(2, eposta);
+        pstmt.setString(3, sifre);
+
+        ResultSet resultSet = pstmt.executeQuery();
+
+        // Sonuç kontrolü
+        if (resultSet.next()) {
+            System.out.println("Giriş başarılı! Hoş geldiniz, " + resultSet.getString("ad") + " " + resultSet.getString("soyad") + ".");
+            return true;
+        } else {
+            System.out.println("Giriş bilgileri hatalı. Lütfen tekrar deneyin.");
+            return false;
+        }
+
+    } catch (SQLException e) {
+        System.out.println("Veritabanı hatası: " + e.getMessage());
+        return false;
+    } finally {
+        // Bağlantıyı kapat
+        try {
+            if (connection != null) {
+                connection.close();
+            }
+        } catch (SQLException e) {
+            System.out.println("Bağlantı kapatılırken hata oluştu: " + e.getMessage());
+        }
+    }
 	}
 
 	@Override
 	public void editProfile() {
-		Scanner scanner = new Scanner(System.in);
-    boolean continueEditing = true;
+    
 
     System.out.println("Profil düzenleme ekranına hoş geldiniz.");
 
@@ -70,10 +115,10 @@ public class yonetici extends kullanıcı {
         }
     }
 
-    scanner.close();
+    
 		
 	}
-
+scanner.close();
 	@Override
 	
 		public void showProfile() {
