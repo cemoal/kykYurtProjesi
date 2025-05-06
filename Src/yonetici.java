@@ -1,5 +1,5 @@
 package Src;
-
+import java.util.scanner;
 public class yonetici extends kullanıcı {
 
 	@Override
